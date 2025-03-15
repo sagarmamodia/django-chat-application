@@ -1,82 +1,13 @@
-{% extends 'main.html' %}
+{% extends 'main.html' %} {% load static %}
+<!--CSS-->
+{% block css_file %}
+<link href="{% static 'css/lobby.css' %}" rel="stylesheet" />
+{% endblock %}
 
-<!-- Styles -->
-{% block styles %}
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #ece5dd;
-    margin: 0;
-    padding: 0;
-  }
-
-  .content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
-  .lobby-container {
-    width: 350px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-  /* Search bar styling */
-  .search-bar {
-    background-color: #f0f0f0;
-    padding: 10px;
-  }
-  .search-bar input {
-    width: 95%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  /* Active chats list styling */
-  .active-chats {
-    max-height: 500px;
-    overflow-y: auto;
-  }
-  .chat-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #e6e6e6;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  .chat-item:hover {
-    background-color: #f9f9f9;
-  }
-  .chat-item:last-child {
-    border-bottom: none;
-  }
-  .profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-    object-fit: cover;
-  }
-  .chat-info {
-    flex: 1;
-  }
-  .chat-name {
-    font-weight: bold;
-    font-size: 16px;
-    color: #075e54;
-    margin-bottom: 4px;
-  }
-  .chat-message {
-    font-size: 14px;
-    color: #555;
-  }
-</style>
-{% endblock styles %}
+<!--Javascript-->
+{% block script_file %}
+<script src="{% static 'js/lobby.js' %}" defer></script>
+{% endblock %}
 
 <!-- Content -->
 {% block content %}
@@ -95,10 +26,10 @@
     <div class="active-chats" id="chatList">
       <!-- Chat items will be created dynamically -->
       {% for chat in active_chats %}
-      <a href="/chat/{{chat.username}}">
+      <a href="/chat/{{chat.username}}/">
         <div class="chat-item">
           <img
-            src="{{chat.profile_icon}}"
+            src="{% static 'images/default_profile_icon.png' %}"
             alt="{{chat.username}}"
             class="profile-icon"
           />
@@ -113,46 +44,6 @@
     </div>
   </div>
 </div>
-{{ active_chats|json_script:"active-chats-data" }} {% endblock content %}
-
-<!-- Script -->
-{% block script %}
-<script>
-  // active chat objects
-  const chats = JSON.parse(
-    document.getElementById("active-chats-data").textContent
-  );
-  console.log(chats);
-  // Render the chat list based on the provided chat array
-  function renderChats(chatArray) {
-    const chatList = document.getElementById("chatList");
-    chatList.innerHTML = ""; // Clear the current list
-    chatArray.forEach((chat) => {
-      // Create container for each chat item
-      const chatItem = document.createElement("div");
-      chatItem.classList.add("chat-item");
-
-      // Create inner HTML structure
-      chatItem.innerHTML = `
-          <img src="${chat.profile_icon}" alt="${chat.username}" class="profile-icon">
-          <div class="chat-info">
-            <div class="chat-name">${chat.username}</div>
-            <div class="chat-message">${chat.last_message}</div>
-          </div>
-        `;
-      chatList.appendChild(chatItem);
-    });
-  }
-
-  // Filter chats based on the search input value
-  function filterChats() {
-    const query = document.getElementById("searchInput").value.toLowerCase();
-    const filteredChats = chats.filter(
-      (chat) =>
-        chat.username.toLowerCase().includes(query) ||
-        chat.last_message.toLowerCase().includes(query)
-    );
-    renderChats(filteredChats);
-  }
-</script>
-{% endblock script %}
+{{ active_chats|json_script:"active-chats-data" }}
+<!--End-->
+{% endblock content %}

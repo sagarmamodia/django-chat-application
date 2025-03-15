@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-decoration: none;
+}
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #075e54; /* WhatsApp dark green */
+  padding: 10px 15px;
+  color: #fff;
+}
+.navbar .logo {
+  display: flex;
+  align-items: center;
+}
+.navbar .logo img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.navbar .logo span {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.navbar .profile {
+  display: flex;
+  align-items: center;
+}
+.navbar .profile img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.navbar .profile span {
+  font-size: 1em;
+  margin-right: 10px;
+}
+
+.auth-btn {
+  background-color: #25d366; /* red similar to WhatsApp */
+  color: #fff;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.auth-btn:hover {
+  background-color: #3eb96b;
+}
+.auth-btn:focus {
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  .navbar .logo span {
+    font-size: 1.2em;
+  }
+  .navbar .profile span {
+    font-size: 0.9em;
+  }
+}

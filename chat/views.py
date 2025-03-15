@@ -5,14 +5,15 @@ from .models import Message
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.templatetags.static import static
 
+@login_required(login_url='/login')
 def home(request):
-    return redirect('/signin')
+    return redirect('/lobby')
 
-def signin(request):
-    
+def login_view(request):
     if request.user.is_authenticated:
-        return HttpResponse("You are already signed in.")
+        return HttpResponse("You are already logged in.")
     
     if request.method == "POST":
         username = request.POST.get('username')
@@ -30,10 +31,9 @@ def signin(request):
         else:
             return HttpResponse("Incorrect username or password")
 
-    return render(request, 'chat/signin.html')
+    return render(request, 'chat/login.html')
 
-def signup(request):
-
+def register_view(request):
     if request.method == "POST":
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -42,13 +42,13 @@ def signup(request):
         #check if email is already in database
         if User.objects.filter(username=username).count() == 0:
             User.objects.create(username=username, email=email, password=password)
-            return redirect('/signin')
+            return redirect('/login')
         else:
             return HttpResponse("Account with the same username already exists.")
 
-    return render(request, 'chat/signup.html')
+    return render(request, 'chat/register.html')
 
-def signout(request):
+def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect('home')
@@ -77,23 +77,23 @@ def lobby(request):
             "user_id":other_user.id,
             "username":other_user.username,
             "last_message": last_message_text,
-            "profile_icon": '#'
+            "profile_icon": static('images/default_profile_icon.png')
         })
         
 
     context = {'active_chats':active_chats}
     return render(request, 'chat/lobby.html', context=context)
 
-@login_required(login_url='signin')
-def chat_page(request, username):
+@login_required(login_url='/login')
+def chat_page(request, receiver_username):
     user = User.objects.get(id=request.user.id)
-    other_user = User.objects.get(username=username)
+    receiver_user = User.objects.get(username=receiver_username)
 
     chat_messages = Message.objects.filter(
-            (Q(sender=user) & Q(receiver=other_user)) | 
-            (Q(sender=other_user) & Q(receiver=user))
+            (Q(sender=user) & Q(receiver=receiver_user)) | 
+            (Q(sender=receiver_user) & Q(receiver=user))
         ).order_by("created")
     
     
-    context = {'username':username, 'chat_messages': chat_messages}
+    context = {'receiver_username':receiver_username, 'chat_messages': chat_messages}
     return render(request, 'chat/chat.html', context=context)

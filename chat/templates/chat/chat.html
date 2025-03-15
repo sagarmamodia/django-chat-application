@@ -1,103 +1,25 @@
-{% extends 'main.html' %}
+{% extends 'main.html' %} {% load static %}
+<!--CSS-->
+{% block css_file %}
+<link href="{% static 'css/chat.css' %}" rel="stylesheet" />
+{% endblock %}
 
-<!--Styles-->
-
-{% block styles %}
-<style>
-  /* Global body styles */
-  .content {
-    margin: 0;
-    padding: 0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #ece5dd;
-    display: flex;
-    /* align-items: center; */
-    justify-content: center;
-    height: 100vh;
-  }
-  /* Chat container */
-  .chat-container {
-    margin-top: 20px;
-    width: 400px;
-    height: 500px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-  }
-  /* Chat header */
-  .chat-header {
-    background-color: #075e54;
-    color: #fff;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-  }
-  /* Chat messages area */
-  .chat-messages {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    /*background: url("https://i.imgur.com/zyxYbTX.png") repeat; WhatsApp-like pattern */
-    background-size: contain;
-  }
-  /* Chat bubble styles */
-  .message {
-    max-width: 70%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 7px;
-    clear: both;
-    word-wrap: break-word;
-  }
-  .message.sent {
-    background-color: #dcf8c6;
-    margin-left: auto;
-  }
-  .message.received {
-    background-color: #fff;
-    border: 1px solid #f0f0f0;
-    margin-right: auto;
-  }
-  /* Chat footer (input area) */
-  .chat-footer {
-    display: flex;
-    padding: 10px;
-    background-color: #f0f0f0;
-    align-items: center;
-  }
-  .chat-footer input[type="text"] {
-    flex: 1;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    outline: none;
-  }
-  .chat-footer button {
-    background-color: #075e54;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    color: #fff;
-    font-size: 18px;
-    cursor: pointer;
-    margin-left: 10px;
-    outline: none;
-  }
-</style>
-
+<!--Javascript-->
+{% block script_file %}
+<script src="{% static 'js/chat.js' %}" defer></script>
 {% endblock %}
 
 <!--Content-->
 {% block content %}
 <div class="content">
   <div class="chat-container">
-    <div class="chat-header">Chat</div>
+    <div class="chat-header">
+      <img
+        src="{% static 'images/default_profile_icon.png' %}"
+        alt="{{receiver_username}}"
+      />
+      <span>{{receiver_username}}</span>
+    </div>
     <div class="chat-messages" id="chat-messages">
       {% for message in chat_messages %}
       <!---->
@@ -116,78 +38,8 @@
   </div>
 </div>
 
-{% endblock %}
+<!--Pass data to javascript-->
+{{ receiver_username|json_script:"username_tag" }}
 
-<!--Script-->
-
-{% block script %}
-<script>
-  const sendBtn = document.getElementById("send-btn");
-  const chatInput = document.getElementById("chat-input");
-  const chatMessages = document.getElementById("chat-messages");
-
-  // Determine the correct WebSocket protocol (ws or wss) based on the page's protocol
-  const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-  // Change the URL below to match your routing for websockets
-  const chatSocket = new WebSocket(
-    wsScheme + "://" + window.location.host + "/ws/chat/" + "{{username}}/"
-  );
-
-  // Function to append a message bubble to the chat area
-  function appendMessage(message, type) {
-    const messageBubble = document.createElement("div");
-    messageBubble.classList.add("message", type);
-    messageBubble.textContent = message;
-    chatMessages.appendChild(messageBubble);
-    // Auto-scroll to the bottom of the chat
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  // Function to send a message via the WebSocket
-  function sendMessage() {
-    const text = chatInput.value.trim();
-    if (text !== "") {
-      // Send the message data via WebSocket in JSON format
-      chatSocket.send(JSON.stringify({ message: text }));
-      // Optionally, you can immediately show the sent message as a "sent" bubble
-      appendMessage(text, "sent");
-      // Clear the input field
-      chatInput.value = "";
-    }
-  }
-
-  // Event listeners for sending messages
-  sendBtn.addEventListener("click", sendMessage);
-  chatInput.addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      sendMessage();
-      e.preventDefault();
-    }
-  });
-
-  // WebSocket event: connection established
-  chatSocket.onopen = function (e) {
-    console.log("WebSocket connection established.");
-  };
-
-  // WebSocket event: message received
-  chatSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    // Assuming the server sends data with a "message" property
-    if (data.message) {
-      // Append received messages with the "received" class
-      appendMessage(data.message, "received");
-    }
-  };
-
-  // WebSocket event: error handling
-  chatSocket.onerror = function (e) {
-    console.error("WebSocket error:", e);
-  };
-
-  // WebSocket event: connection closed
-  chatSocket.onclose = function (e) {
-    console.log("WebSocket connection closed.");
-  };
-</script>
+<!--endblock-->
 {% endblock %}

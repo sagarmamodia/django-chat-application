@@ -1,0 +1,95 @@
+/* Global body styles */
+.content {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #ece5dd;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  height: 100vh;
+}
+/* Chat container */
+.chat-container {
+  margin-top: 20px;
+  width: 400px;
+  height: 500px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+/* Chat header */
+.chat-header {
+  background-color: #075e54;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.chat-header span {
+  color: #fff;
+  padding: 15px 5px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+.chat-header img {
+  margin-left: 3%;
+  width: 50px;
+  height: 50px;
+}
+/* Chat messages area */
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  /*background: url("https://i.imgur.com/zyxYbTX.png") repeat; WhatsApp-like pattern */
+  background-size: contain;
+}
+/* Chat bubble styles */
+.message {
+  max-width: 70%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 7px;
+  clear: both;
+  word-wrap: break-word;
+}
+.message.sent {
+  background-color: #dcf8c6;
+  margin-left: auto;
+}
+.message.received {
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
+  margin-right: auto;
+}
+/* Chat footer (input area) */
+.chat-footer {
+  display: flex;
+  padding: 10px;
+  background-color: #f0f0f0;
+  align-items: center;
+}
+.chat-footer input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+}
+.chat-footer button {
+  background-color: #075e54;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+  outline: none;
+}

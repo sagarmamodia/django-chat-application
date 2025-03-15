@@ -3,9 +3,9 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('signin/', views.signin, name='signin'),
-    path('signup/', views.signup, name='signup'),
-    path('signout/', views.signout, name='signout'),
+    path('login/', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
     path('lobby/', views.lobby, name='lobby'),
-    path('chat/<str:username>', views.chat_page, name='chat-page'),
+    path('chat/<str:receiver_username>/', views.chat_page, name='chat-page'),
 ]

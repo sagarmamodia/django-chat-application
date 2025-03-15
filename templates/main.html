@@ -5,14 +5,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    {% block styles %} {% endblock %}
+    <title>djCHAT</title>
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+    <!--CSS file link-->
+    {% block css_file %} {% endblock %}
+    <!-- Javascript file link -->
+    {% block script_file %} {% endblock %}
   </head>
   <body>
-    {% include 'navbar.html' %}
-    <!-- <div></div> -->
+    <nav class="navbar">
+      <!-- Left: Logo and Website Name -->
+      <a href="{% url 'lobby' %}">
+        <div class="logo">
+          <img src="{% static 'images/app_logo.png' %}" alt="Logo" />
+          <span>djCHAT</span>
+        </div>
+      </a>
+
+      <!-- Right: Profile Section -->
+      <div class="profile">
+        {% if request.user.is_authenticated %}
+        <span>{{ request.user.username }}</span>
+        <img
+          src="{% static 'images/default_profile_icon.png' %}"
+          alt="Profile Picture"
+        />
+        <a class="auth-btn" href="/logout">Log out</a>
+        {% else %}
+        <img
+          src="{% static 'images/default_profile_icon.png' %}"
+          alt="Profile Picture"
+        />
+        <a class="auth-btn" href="/login">Log In</a>
+        {% endif %}
+      </div>
+    </nav>
+    <!-- Main HTML Content -->
     {% block content %} {% endblock %}
-    <!-- <div></div> -->
-    {% block script %} {% endblock script %}
   </body>
 </html>
