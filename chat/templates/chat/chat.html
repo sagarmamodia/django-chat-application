@@ -24,7 +24,25 @@
       {% for message in chat_messages %}
       <!---->
       {% if message.sender.username == request.user.username %}
-      <div class="message sent">{{message.body}}</div>
+      <div class="message sent">
+        <div class="message-text">{{message.body}}</div>
+        <div class="message-actions">
+          <div
+            id="message-edit-btn"
+            class="edit-btn"
+            data-info="{{message.id}}"
+          >
+            <img src="{% static 'images/edit_icon.png' %}" alt="edit" />
+          </div>
+          <div
+            id="message-delete-btn"
+            class="delete-btn"
+            data-info="{{message.id}}"
+          >
+            <img src="{% static 'images/delete_icon.png' %}" alt="delete" />
+          </div>
+        </div>
+      </div>
       {% else %}
       <div class="message received">{{message.body}}</div>
       {% endif %}
@@ -38,8 +56,24 @@
   </div>
 </div>
 
+<!-- Overlay -->
+<div id="overlay" class="overlay"></div>
+
+<!-- Confirmation Dialog -->
+<div id="confirmationDialog" class="dialog">
+  <p>Are you sure you want to proceed?</p>
+  <button id="confirmBtn">Confirm</button>
+  <button id="cancelBtn">Cancel</button>
+</div>
+
 <!--Pass data to javascript-->
-{{ receiver_username|json_script:"username_tag" }}
+{{ receiver_username|json_script:"receiver-username-tag" }}
+<!---->
+{{sender_username|json_script:"sender-username-tag"}}
+<!---->
+{{ edit_icon_url|json_script:"edit-icon-url"}}
+<!---->
+{{delete_icon_url|json_script:"delete-icon-url"}}
 
 <!--endblock-->
 {% endblock %}

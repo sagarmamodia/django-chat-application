@@ -30,15 +30,12 @@ class ChatConsumer(WebsocketConsumer):
         message = text_parsed_data["message"]
         sender = User.objects.get(username=self.user.username)
         receiver = User.objects.get(username=self.other_user)
-        Message.objects.create(sender=sender, receiver=receiver, body=message)
+        created_message = Message.objects.create(sender=sender, receiver=receiver, body=message)
 
         async_to_sync(self.channel_layer.group_send)(
-            self.chat_group_name, {"type": "chat.message", "sender": self.user.username, "message": message}
+            self.chat_group_name, {"type": "chat.message", "id": created_message.id,  "sender_username": self.user.username, "message_text": message}
         )
 
     def chat_message(self, event):
-        message = event["message"]
-
         # Send message to WebSocket
-        if event['sender'] != self.user.username:
-            self.send(text_data=json.dumps({"message": message}))
+        self.send(text_data=json.dumps({"id": event['id'], "senderUsername": event['sender_username'], "messageText": event['message_text']}))

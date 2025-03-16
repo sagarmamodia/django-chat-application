@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from .models import Message
 from django.contrib.auth.models import User
@@ -95,9 +95,20 @@ def chat_page(request, receiver_username):
         ).order_by("created")
     
     
-    context = {'receiver_username':receiver_username, 'chat_messages': chat_messages}
+    context = {'sender_username': user.username, 
+               'receiver_username':receiver_username, 
+               'chat_messages': chat_messages, 
+               'delete_icon_url': static('images/delete_icon.png'), 
+               'edit_icon_url': static('images/edit_icon.png'),
+               }
     return render(request, 'chat/chat.html', context=context)
 
+@login_required(login_url='/login')
+def delete_message(request, receiver_username, pk):
+    if request.method == "GET":
+        message = Message.objects.get(id=pk)
+        if message is not None:
+            message.delete()
 
-
-# Delete and Edit your messages
+    return redirect('chat-page', receiver_username=receiver_username)
+    
