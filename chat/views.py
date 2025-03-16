@@ -97,3 +97,7 @@ def chat_page(request, receiver_username):
     
     context = {'receiver_username':receiver_username, 'chat_messages': chat_messages}
     return render(request, 'chat/chat.html', context=context)
+
+
+
+# Delete and Edit your messages
