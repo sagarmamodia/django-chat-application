@@ -9,17 +9,19 @@ function renderChats(chatArray) {
   chatList.innerHTML = ""; // Clear the current list
   chatArray.forEach((chat) => {
     // Create container for each chat item
-    const chatItem = document.createElement("div");
-    chatItem.classList.add("chat-item");
+    const chatItem = document.createElement("a");
+    chatItem.setAttribute("href", `/chat/${chat.username}`);
 
     // Create inner HTML structure
     chatItem.innerHTML = `
+      <div class="chat-item">
           <img src="${chat.profile_icon}" alt="${chat.username}" class="profile-icon">
           <div class="chat-info">
             <div class="chat-name">${chat.username}</div>
             <div class="chat-message">${chat.last_message}</div>
           </div>
-        `;
+       <div>
+       `;
     chatList.appendChild(chatItem);
   });
 }

@@ -14,7 +14,7 @@ const editIconUrl = JSON.parse(
   document.getElementById("edit-icon-url").textContent
 );
 const deleteBtns = document.querySelectorAll("#message-delete-btn");
-const editBtns = document.querySelectorAll("#message-edit-btn");
+// const editBtns = document.querySelectorAll("#message-edit-btn");
 
 // Determine the correct WebSocket protocol (ws or wss) based on the page's protocol
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
