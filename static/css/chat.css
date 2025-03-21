@@ -150,7 +150,8 @@
 }
 
 /* Dialog Box */
-.dialog {
+.dialog,
+.fileUploadDialog {
   display: none;
   position: fixed;
   top: 50%;

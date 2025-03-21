@@ -51,6 +51,7 @@
     </div>
     <div class="chat-footer">
       <input type="text" id="chat-input" placeholder="Type a message..." />
+      <button id="file-upload-btn">&#x1F4E4;</button>
       <button id="send-btn">&#10148;</button>
     </div>
   </div>
@@ -58,6 +59,20 @@
 
 <!-- Overlay -->
 <div id="overlay" class="overlay"></div>
+
+<!-- File Upload Dialog -->
+<div id="fileUploadDialog" class="fileUploadDialog">
+  <form
+    id="fileUploadForm"
+    action="upload/"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+    <input type="file" name="toUploadFile" />
+    <button id="upload-btn" type="submit">&#10148;</button>
+  </form>
+</div>
 
 <!-- Confirmation Dialog -->
 <div id="confirmationDialog" class="dialog">

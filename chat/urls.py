@@ -9,4 +9,5 @@ urlpatterns = [
     path('lobby/', views.lobby, name='lobby'),
     path('chat/<str:receiver_username>/', views.chat_page, name='chat-page'),
     path('chat/<str:receiver_username>/delete/<int:pk>/', views.delete_message, name='delete-message'),
+    path('chat/<str:receiver_username>/upload/', views.upload_file, name='upload-file'),
 ]

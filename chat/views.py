@@ -111,4 +111,12 @@ def delete_message(request, receiver_username, pk):
             message.delete()
 
     return redirect('chat-page', receiver_username=receiver_username)
+
+@login_required(login_url='/login')
+def upload_file(request, receiver_username):
     
+    if request.method == 'POST':
+        file = request.FILES['toUploadFile']
+        print(file)
+    
+    return redirect('chat-page', receiver_username=receiver_username)

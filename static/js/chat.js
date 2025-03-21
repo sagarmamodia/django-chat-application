@@ -3,7 +3,9 @@ const sendBtn = document.getElementById("send-btn");
 const chatInput = document.getElementById("chat-input");
 const chatMessages = document.getElementById("chat-messages");
 const deleteBtns = document.querySelectorAll("#message-delete-btn");
+const fileUploadBtn = document.querySelector("#file-upload-btn");
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const fileUploadForm = document.querySelector("#fileUploadForm");
 
 /* ============= DATA FROM DJANGO ============= */
 const receiverUsername = JSON.parse(
@@ -114,6 +116,11 @@ function deleteMessageRequest(messageId) {
   window.location.href = window.location.href + "delete/" + messageId;
 }
 
+function showFileUploadDialog() {
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("fileUploadDialog").style.display = "block";
+}
+
 /* ================================ EVENT LISTENERS ====================================== */
 
 sendBtn.addEventListener("click", sendMessage);
@@ -130,3 +137,12 @@ deleteBtns.forEach((btn) => {
     showConfirmationDialog(deleteMessageRequest, messageId);
   });
 });
+
+fileUploadBtn.addEventListener("click", (e) => {
+  showFileUploadDialog();
+});
+
+// fileUploadForm.onsubmit = function () {
+//   document.getElementById("overlay").style.display = "none";
+//   document.getElementById("fileUploadDialog").style.display = "none";
+// };
