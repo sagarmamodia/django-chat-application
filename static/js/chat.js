@@ -1,6 +1,11 @@
+/* ============== READ INPUT ================*/
 const sendBtn = document.getElementById("send-btn");
 const chatInput = document.getElementById("chat-input");
 const chatMessages = document.getElementById("chat-messages");
+const deleteBtns = document.querySelectorAll("#message-delete-btn");
+const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+
+/* ============= DATA FROM DJANGO ============= */
 const receiverUsername = JSON.parse(
   document.getElementById("receiver-username-tag").textContent
 );
@@ -13,17 +18,44 @@ const deleteIconUrl = JSON.parse(
 const editIconUrl = JSON.parse(
   document.getElementById("edit-icon-url").textContent
 );
-const deleteBtns = document.querySelectorAll("#message-delete-btn");
-// const editBtns = document.querySelectorAll("#message-edit-btn");
 
-// Determine the correct WebSocket protocol (ws or wss) based on the page's protocol
-const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-// Change the URL below to match your routing for websockets
+/* ================== WEBSOCKET ===================*/
 const chatSocket = new WebSocket(
   wsScheme + "://" + window.location.host + "/ws/chat/" + `${receiverUsername}/`
 );
 
-// Function to append a message bubble to the chat area
+chatSocket.onopen = function (e) {
+  console.log("WebSocket connection established.");
+};
+
+chatSocket.onerror = function (e) {
+  console.error("WebSocket error:", e);
+};
+
+chatSocket.onclose = function (e) {
+  console.log("WebSocket connection closed.");
+};
+
+function sendMessage() {
+  const text = chatInput.value.trim();
+  if (text !== "") {
+    // Send the message data via WebSocket in JSON format
+    chatSocket.send(JSON.stringify({ message: text }));
+    // Clear the input field
+    chatInput.value = "";
+  }
+}
+
+chatSocket.onmessage = function (e) {
+  const data = JSON.parse(e.data);
+  // Assuming the server sends data with a "message" property
+  if (data.messageText) {
+    const type = data.senderUsername == senderUsername ? "sent" : "received";
+    appendMessage(data.id, data.messageText, type);
+  }
+};
+
+/* =============================== DOM ALTER FUNCTIONS =============================== */
 function appendMessage(messageId, messageText, type) {
   const messageBubble = document.createElement("div");
   messageBubble.classList.add("message", type);
@@ -61,52 +93,6 @@ function appendMessage(messageId, messageText, type) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Function to send a message via the WebSocket
-function sendMessage() {
-  const text = chatInput.value.trim();
-  if (text !== "") {
-    // Send the message data via WebSocket in JSON format
-    chatSocket.send(JSON.stringify({ message: text }));
-    // Clear the input field
-    chatInput.value = "";
-  }
-}
-
-// Event listeners for sending messages
-sendBtn.addEventListener("click", sendMessage);
-chatInput.addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    sendMessage();
-    e.preventDefault();
-  }
-});
-
-// WebSocket event: connection established
-chatSocket.onopen = function (e) {
-  console.log("WebSocket connection established.");
-};
-
-// WebSocket event: message received
-chatSocket.onmessage = function (e) {
-  const data = JSON.parse(e.data);
-  // Assuming the server sends data with a "message" property
-  if (data.messageText) {
-    const type = data.senderUsername == senderUsername ? "sent" : "received";
-    appendMessage(data.id, data.messageText, type);
-  }
-};
-
-// WebSocket event: error handling
-chatSocket.onerror = function (e) {
-  console.error("WebSocket error:", e);
-};
-
-// WebSocket event: connection closed
-chatSocket.onclose = function (e) {
-  console.log("WebSocket connection closed.");
-};
-
-// function to delete message
 function showConfirmationDialog(callback, messageId) {
   document.getElementById("overlay").style.display = "block";
   document.getElementById("confirmationDialog").style.display = "block";
@@ -127,6 +113,16 @@ function closeDialog() {
 function deleteMessageRequest(messageId) {
   window.location.href = window.location.href + "delete/" + messageId;
 }
+
+/* ================================ EVENT LISTENERS ====================================== */
+
+sendBtn.addEventListener("click", sendMessage);
+chatInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    sendMessage();
+    e.preventDefault();
+  }
+});
 
 deleteBtns.forEach((btn) => {
   btn.addEventListener("click", (e) => {
