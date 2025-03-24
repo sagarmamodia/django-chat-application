@@ -25,7 +25,12 @@
       <!---->
       {% if message.sender.username == request.user.username %}
       <div class="message sent">
+        {% if message.message_type == "image" %}
+        <img class="message-image" src="/{{message.body}}" alt="image" />
+        {% else %}
         <div class="message-text">{{message.body}}</div>
+        {% endif %}
+
         <div class="message-actions">
           <!-- <div
             id="message-edit-btn"
@@ -44,7 +49,15 @@
         </div>
       </div>
       {% else %}
-      <div class="message received">{{message.body}}</div>
+      <div class="message received">
+        <!--1st Nested if-->
+        {% if message.message_type == "image" %}
+        <img class="message-image" src="/{{message.body}}" alt="image" />
+        {% else %}
+        <div class="message-text">{{message.body}}</div>
+        {% endif %}
+      </div>
+      <!--Outer if-->
       {% endif %}
       <!---->
       {% endfor %}
