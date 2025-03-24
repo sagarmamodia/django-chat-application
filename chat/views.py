@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
@@ -6,6 +8,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.templatetags.static import static
+from django_chat_app import settings
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+# from PIL import Image
 
 @login_required(login_url='/login')
 def home(request):
@@ -38,10 +45,11 @@ def register_view(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        print(password)
 
         #check if email is already in database
         if User.objects.filter(username=username).count() == 0:
-            User.objects.create(username=username, email=email, password=password)
+            User.objects.create_user(username=username, email=email, password=password)
             return redirect('/login')
         else:
             return HttpResponse("Account with the same username already exists.")
@@ -100,6 +108,7 @@ def chat_page(request, receiver_username):
                'chat_messages': chat_messages, 
                'delete_icon_url': static('images/delete_icon.png'), 
                'edit_icon_url': static('images/edit_icon.png'),
+               'media_url': settings.MEDIA_URL
                }
     return render(request, 'chat/chat.html', context=context)
 
@@ -111,4 +120,35 @@ def delete_message(request, receiver_username, pk):
             message.delete()
 
     return redirect('chat-page', receiver_username=receiver_username)
+
+@login_required(login_url='/login')
+def upload_file(request, receiver_username):
+    if request.method == 'POST':
+        file = request.FILES['toUploadFile']
+        file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+        if not os.path.exists(file_path):
+            with open(file_path, "wb+") as img:
+                img.write(file.read())
+        
+        sender = User.objects.get(username=request.user.username)
+        receiver = User.objects.get(username=receiver_username)
+        file_url = os.path.join(settings.MEDIA_URL, file.name)
+        created_message = Message.objects.create(sender=sender, receiver=receiver, message_type="image", body=file_url)
     
+        chat_group_name = ""
+        if request.user.username > receiver_username:
+            chat_group_name = request.user.username + receiver_username
+        else:
+            chat_group_name = receiver_username + request.user.username
+        
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            chat_group_name, 
+            {"type": "chat.message", 
+             "id": created_message.id,  
+             "sender_username": request.user.username, 
+             "message_type": created_message.message_type, 
+             "message_text": created_message.body}
+        )
+
+    return redirect('chat-page', receiver_username=receiver_username)

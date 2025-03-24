@@ -12,7 +12,7 @@
 /* Chat container */
 .chat-container {
   margin-top: 20px;
-  width: 400px;
+  width: 70vw;
   height: 500px;
   background-color: #fff;
   display: flex;
@@ -77,8 +77,12 @@
 
 .message.received {
   background-color: #fff;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #313030;
   margin-right: auto;
+}
+
+.message-image {
+  max-width: 30vw;
 }
 
 .delete-btn,
@@ -150,7 +154,8 @@
 }
 
 /* Dialog Box */
-.dialog {
+.dialog,
+.fileUploadDialog {
   display: none;
   position: fixed;
   top: 50%;

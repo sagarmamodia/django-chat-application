@@ -3,7 +3,9 @@ const sendBtn = document.getElementById("send-btn");
 const chatInput = document.getElementById("chat-input");
 const chatMessages = document.getElementById("chat-messages");
 const deleteBtns = document.querySelectorAll("#message-delete-btn");
+const fileUploadBtn = document.querySelector("#file-upload-btn");
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const fileUploadForm = document.querySelector("#fileUploadForm");
 
 /* ============= DATA FROM DJANGO ============= */
 const receiverUsername = JSON.parse(
@@ -40,34 +42,48 @@ function sendMessage() {
   const text = chatInput.value.trim();
   if (text !== "") {
     // Send the message data via WebSocket in JSON format
-    chatSocket.send(JSON.stringify({ message: text }));
+    chatSocket.send(JSON.stringify({ message_type: "text", message: text }));
     // Clear the input field
     chatInput.value = "";
   }
 }
+
+// function sendImageURL(imageName) {
+//   if (imageName !== "") {
+//     chatSocket.send(
+//       JSON.stringify({ message_type: "image", message: imageName })
+//     );
+//   }
+// }
 
 chatSocket.onmessage = function (e) {
   const data = JSON.parse(e.data);
   // Assuming the server sends data with a "message" property
   if (data.messageText) {
     const type = data.senderUsername == senderUsername ? "sent" : "received";
-    appendMessage(data.id, data.messageText, type);
+    console.log(data.messageText);
+    appendMessage(data.id, data.messageText, data.messageType, type);
   }
 };
 
 /* =============================== DOM ALTER FUNCTIONS =============================== */
-function appendMessage(messageId, messageText, type) {
+function appendMessage(messageId, messageText, messageType, type) {
   const messageBubble = document.createElement("div");
   messageBubble.classList.add("message", type);
+
+  let messageElement = `<div class="message-text">${messageText}</div>`;
+  if (messageType == "image") {
+    messageElement = `<img class="message-image" src="/${messageText}" alt='image'>`;
+  }
+
   if (type == "sent") {
-    messageBubble.innerHTML = `<div class="message-text">${messageText}</div>
+    messageBubble.innerHTML = `${messageElement}
         <div class="message-actions">
           <div
             id="message-edit-btn"
             class="edit-btn"
             data-info="${messageId}"
           >
-            <img src="${editIconUrl}" alt="edit" />
           </div>
           <div
             id="message-delete-btn"
@@ -78,7 +94,7 @@ function appendMessage(messageId, messageText, type) {
           </div>
         </div>`;
   } else {
-    messageBubble.innerHTML = `${messageText}`;
+    messageBubble.innerHTML = `${messageElement}`;
   }
 
   chatMessages.appendChild(messageBubble);
@@ -114,6 +130,11 @@ function deleteMessageRequest(messageId) {
   window.location.href = window.location.href + "delete/" + messageId;
 }
 
+function showFileUploadDialog() {
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("fileUploadDialog").style.display = "block";
+}
+
 /* ================================ EVENT LISTENERS ====================================== */
 
 sendBtn.addEventListener("click", sendMessage);
@@ -130,3 +151,17 @@ deleteBtns.forEach((btn) => {
     showConfirmationDialog(deleteMessageRequest, messageId);
   });
 });
+
+fileUploadBtn.addEventListener("click", (e) => {
+  showFileUploadDialog();
+});
+
+// fileUploadForm.onsubmit = function (e) {
+//   e.preventDefault();
+//   const formData = new FormData(e.target);
+//   const fileName = formData.get("toUploadFile").name;
+//   sendImageURL(fileName);
+//   document.getElementById("overlay").style.display = "none";
+//   document.getElementById("fileUploadDialog").style.display = "none";
+//   e.target.submit();
+// };
