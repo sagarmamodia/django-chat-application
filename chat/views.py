@@ -126,6 +126,11 @@ def upload_file(request, receiver_username):
     if request.method == 'POST':
         file = request.FILES['toUploadFile']
         file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         if not os.path.exists(file_path):
             with open(file_path, "wb+") as img:
                 img.write(file.read())

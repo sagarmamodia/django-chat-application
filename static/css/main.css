@@ -70,11 +70,19 @@ a:active {
 }
 
 /* Responsive adjustments */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 400px) {
+  .root {
+    width: 75vw;
+    overflow: hidden;
+  }
   .navbar .logo span {
-    font-size: 1.2em;
+    display: none;
   }
   .navbar .profile span {
     font-size: 0.9em;
+  }
+
+  .navbar .logo img {
+    margin-right: 0;
   }
 }

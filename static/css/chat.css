@@ -7,19 +7,19 @@
   display: flex;
   /* align-items: center; */
   justify-content: center;
-  height: 100vh;
 }
 /* Chat container */
 .chat-container {
-  margin-top: 20px;
+  margin-top: 5px;
   width: 70vw;
-  height: 500px;
+  height: 85vh;
   background-color: #fff;
   display: flex;
   flex-direction: column;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  position: absolute;
 }
 /* Chat header */
 .chat-header {
@@ -188,4 +188,17 @@
 #cancelBtn {
   background-color: #f44336; /* Red */
   color: white;
+}
+
+@media only screen and (max-width: 480px) {
+  .chat-container {
+    margin-top: 5px;
+    height: 60vh;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
 }
