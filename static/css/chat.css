@@ -193,7 +193,8 @@
 @media only screen and (max-width: 480px) {
   .chat-container {
     margin-top: 5px;
-    height: 60vh;
+    height: 90vh;
+    width: 95vw;
     background-color: #fff;
     display: flex;
     flex-direction: column;
