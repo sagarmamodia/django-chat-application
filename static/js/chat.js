@@ -127,7 +127,7 @@ function closeDialog() {
 }
 
 function deleteMessageRequest(messageId) {
-  window.location.href = window.location.href + "delete/" + messageId;
+  window.location.href = window.location.href + "delete/" + messageId + "/";
 }
 
 function showFileUploadDialog() {

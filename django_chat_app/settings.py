@@ -92,6 +92,8 @@ DATABASES = {
     }
 }
 
+MONGO_DB_URI = "mongodb://localhost:27017/"
+MONGO_DB_NAME = "DJANGO_CHAT_APP"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -137,7 +139,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Media files (User uploaded files)
-MEDIA_URL  = 'media/'
-MEDIA_ROOT = BASE_DIR / MEDIA_URL

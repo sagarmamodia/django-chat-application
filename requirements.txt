@@ -10,3 +10,4 @@ redis==5.2.1
 setuptools==76.0.0
 SQLAlchemy==2.0.38
 uvicorn==0.34.0
+pymongo==4.11.3

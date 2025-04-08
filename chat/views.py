@@ -13,10 +13,11 @@ from django_chat_app import settings
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # from PIL import Image
+from . import mongo
 
-@login_required(login_url='/login')
+@login_required(login_url='/login/')
 def home(request):
-    return redirect('/lobby')
+    return redirect('/lobby/')
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -34,7 +35,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('/lobby')
+            return redirect('lobby')
         else:
             return HttpResponse("Incorrect username or password")
 
@@ -50,7 +51,7 @@ def register_view(request):
         #check if email is already in database
         if User.objects.filter(username=username).count() == 0:
             User.objects.create_user(username=username, email=email, password=password)
-            return redirect('/login')
+            return redirect('login')
         else:
             return HttpResponse("Account with the same username already exists.")
 
@@ -92,7 +93,7 @@ def lobby(request):
     context = {'active_chats':active_chats}
     return render(request, 'chat/lobby.html', context=context)
 
-@login_required(login_url='/login')
+@login_required(login_url='/login/')
 def chat_page(request, receiver_username):
     user = User.objects.get(id=request.user.id)
     receiver_user = User.objects.get(username=receiver_username)
@@ -108,37 +109,46 @@ def chat_page(request, receiver_username):
                'chat_messages': chat_messages, 
                'delete_icon_url': static('images/delete_icon.png'), 
                'edit_icon_url': static('images/edit_icon.png'),
-               'media_url': settings.MEDIA_URL
+            #    'media_url': settings.MEDIA_URL
                }
     return render(request, 'chat/chat.html', context=context)
 
-@login_required(login_url='/login')
+@login_required(login_url='/login/')
 def delete_message(request, receiver_username, pk):
     if request.method == "GET":
         message = Message.objects.get(id=pk)
+
+        if message is not None and message.message_type == "image":
+            # delete only if there are no messages that uses this image
+            messages_cnt = Message.objects.filter(message_type="image", body=message.body).count()
+            if messages_cnt==1:
+                mongo.delete_image(message.body)
+                
         if message is not None:
             message.delete()
 
     return redirect('chat-page', receiver_username=receiver_username)
 
-@login_required(login_url='/login')
+@login_required(login_url='/login/')
 def upload_file(request, receiver_username):
     if request.method == 'POST':
         file = request.FILES['toUploadFile']
-        file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+        file_extension = file.name.split('.')[-1]
+        # Two uses can have different files with same name
+        unique_file_name = request.user.username + "_" + file.name
 
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        if not os.path.exists(file_path):
-            with open(file_path, "wb+") as img:
-                img.write(file.read())
+        # check if the file is indeed an image
+        # ... logic here
         
+        # store file in mongodb
+        try:
+            mongo.store_image(unique_file_name, file.read(), f'image/{file_extension}')
+        except:
+            return HttpResponse("Could not upload your file.", status=500)
+
         sender = User.objects.get(username=request.user.username)
         receiver = User.objects.get(username=receiver_username)
-        file_url = os.path.join(settings.MEDIA_URL, file.name)
-        created_message = Message.objects.create(sender=sender, receiver=receiver, message_type="image", body=file_url)
+        created_message = Message.objects.create(sender=sender, receiver=receiver, message_type="image", body=file.name)
     
         chat_group_name = ""
         if request.user.username > receiver_username:
@@ -157,3 +167,11 @@ def upload_file(request, receiver_username):
         )
 
     return redirect('chat-page', receiver_username=receiver_username)
+
+@login_required(login_url='/login/')
+def serve_image(request, filename):
+    obj = mongo.retrieve_image(filename)
+    if obj:
+        return HttpResponse(obj.read(), status=200, content_type=obj._file.get("content_type"))
+    else:
+        return HttpResponse("Image not found", status=404)
